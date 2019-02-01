@@ -4,7 +4,8 @@
   "description": "RFGP via web",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "node app.js",
+    "dev": "nodemon bin/dev"
   },
   "repository": {
     "type": "git",
@@ -21,10 +22,12 @@
   },
   "homepage": "https://github.com/leomotta121/rfgp-web#readme",
   "devDependencies": {
+    "dotenv": "^6.2.0",
     "nodemon": "^1.18.9"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "mongoose": "^5.4.8"
   }
 }
