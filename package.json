@@ -1,0 +1,30 @@
+{
+  "name": "rfgp-web",
+  "version": "1.0.0",
+  "description": "RFGP via web",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leomotta121/rfgp-web.git"
+  },
+  "keywords": [
+    "rfgp",
+    "web"
+  ],
+  "author": "Leonardo Motta",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leomotta121/rfgp-web/issues"
+  },
+  "homepage": "https://github.com/leomotta121/rfgp-web#readme",
+  "devDependencies": {
+    "nodemon": "^1.18.9"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4"
+  }
+}
