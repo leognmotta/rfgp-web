@@ -11,6 +11,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use('/auth', authRoutes);
 
+app.use((error, req, res, next) => {
+  console.log(error);
+  const status = error.statusCode || 500;
+  const message = error.message;
+  res.status(status).json({ message: message, status: status });
+});
+
 mongoose
   .connect(
     `mongodb+srv://${process.env.DB_USER}:${
