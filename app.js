@@ -40,11 +40,11 @@ mongoose
     `mongodb+srv://${process.env.DB_USER}:${
       process.env.DB_PASSWORD
     }@cluster0-sud5s.mongodb.net/${process.env.DB_NAME}`,
-    { useNewUrlParser: true, useFindAndModify: false }
+    { useNewUrlParser: true, useFindAndModify: false, useCreateIndex: true }
   )
   .then(result => {
-    app.listen(process.env.PORT, () => {
-      console.log(`App listening on port ${process.env.PORT}`);
+    app.listen(process.env.PORT || 3000, () => {
+      console.log(`App listening on port ${process.env.PORT || 3000}`);
     });
   })
   .catch(error => {

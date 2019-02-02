@@ -18,8 +18,14 @@ exports.confirmEmail = async (req, res, next) => {
         .json({ message: `${user.name}, seu email ja esta confirmado!` });
     }
 
-    user.emailChecked = true;
-    await User.findOneAndUpdate(user);
+    // user.emailChecked = true;
+    // user.emailToken = undefined;
+    await User.findByIdAndUpdate(user._id, {
+      $set: {
+        emailChecked: true,
+        emailToken: undefined
+      }
+    });
 
     return res.status(201).json({
       message: `Ola, ${user.name} seu e-mail foi confirmado com sucesso!`

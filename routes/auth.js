@@ -8,4 +8,11 @@ router.post('/register', authController.register);
 
 router.post('/authenticate', authController.authenticate);
 
+router.post('/send-reset-password', authController.sendResetPassword);
+
+router.post(
+  '/reset-password/:passwordResetToken',
+  authController.resetPassword
+);
+
 module.exports = router;

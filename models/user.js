@@ -18,14 +18,23 @@ const UserSchema = new mongoose.Schema({
     default: false
   },
   emailToken: {
-    type: String
+    type: String,
+    select: false
   },
   password: {
     type: String,
     required: true,
     select: false
   },
-  cretedAt: {
+  passwordResetToken: {
+    type: String,
+    select: false
+  },
+  passwordResetExpires: {
+    type: Date,
+    select: false
+  },
+  createdAt: {
     type: Date,
     default: Date.now
   }

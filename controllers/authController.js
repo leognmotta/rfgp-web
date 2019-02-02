@@ -4,16 +4,7 @@ const User = require('../models/user');
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
-const sendgridTransport = require('nodemailer-sendgrid-transport');
-
-const transporter = nodemailer.createTransport(
-  sendgridTransport({
-    auth: {
-      api_key: process.env.SENDGRID_KEY
-    }
-  })
-);
+const transporter = require('../configs/sendgrid');
 
 exports.register = async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -34,10 +25,11 @@ exports.register = async (req, res, next) => {
     }
 
     const user = await User.create(req.body);
-
-    let emailToken = createEmailToken() + `${user._id.toString()}`;
+    let emailToken =
+      crypto.randomBytes(16).toString('hex') + `${user._id.toString()}`;
     user.emailToken = emailToken;
-    await user.save();
+
+    await User.findOneAndUpdate(user);
     user.password = undefined;
 
     transporter.sendMail({
@@ -109,7 +101,86 @@ exports.authenticate = async (req, res, next) => {
   }
 };
 
-const createEmailToken = () => {
-  const token = crypto.randomBytes(32).toString('hex');
-  return token;
+exports.sendResetPassword = async (req, res, next) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      const error = new Error('User not found');
+      error.statusCode = 400;
+      error.message = 'User not found, could not send reset password email.';
+      throw error;
+    }
+
+    const token =
+      crypto.randomBytes(20).toString('hex') + `${user._id.toString()}`;
+
+    const expirationDate = new Date();
+    expirationDate.setHours(expirationDate.getHours() + 1);
+
+    await User.findByIdAndUpdate(user._id, {
+      $set: {
+        passwordResetToken: token,
+        passwordResetExpires: expirationDate
+      }
+    });
+
+    transporter.sendMail({
+      to: { name: user.name, address: user.email },
+      from: { address: 'no-reply@rfgpweb.com.br', name: 'rfgpweb' },
+      subject: 'Resetar senha',
+      html: `
+        <h1>Esqueceu sua senha?</h1>
+        <p> Resete sua senha clicando no link abaixo: </p>
+        <a href="http://localhost:8080/auth/send-reset-password/${token}">http://localhost:8080/auth/send-reset-password/${token}</a>
+      `
+    });
+
+    return res.status(200).json({ message: 'Email sent!' });
+  } catch (error) {
+    if (!error.statusCode) {
+      error.statusCode = 500;
+    }
+    next(error);
+  }
+};
+
+exports.resetPassword = async (req, res, next) => {
+  const { passwordResetToken } = req.params;
+  const { password } = req.body;
+
+  try {
+    const user = await User.findOne({ passwordResetToken });
+
+    if (!user) {
+      const error = new Error('User not found');
+      error.statusCode = 404;
+      error.message = 'Could not find user';
+      throw error;
+    }
+
+    const now = new Date();
+
+    if (now > user.passwordResetExpires) {
+      const error = new Error('Token expired!');
+      error.statusCode(400);
+      error.message = 'Token expired!';
+      throw error;
+    }
+
+    user.password = password;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save();
+
+    return res.status(200).json({ message: 'Senha alterada com sucesso!' });
+  } catch (error) {
+    if (!error.statusCode) {
+      error.statusCode = 500;
+    }
+    next(error);
+  }
 };
