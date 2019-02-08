@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+require('body-parser-xml')(bodyParser);
 const mongoose = require('mongoose');
 
 const authRoutes = require('./routes/auth');
@@ -9,6 +10,15 @@ const userConfigRoutes = require('./routes/userConfig');
 const app = express();
 
 app.use(bodyParser.json());
+app.use(
+  bodyParser.xml({
+    xmlParseOptions: {
+      normalize: true, // Trim whitespace inside text nodes
+      normalizeTags: true, // Transform tags to lowercase
+      explicitArray: false // Only put nodes in array if >1
+    }
+  })
+);
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {

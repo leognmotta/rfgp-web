@@ -7,4 +7,6 @@ const router = express.Router();
 
 router.get('/', isAuth, projectController.default);
 
+router.post('/xml', projectController.testXML);
+
 module.exports = router;

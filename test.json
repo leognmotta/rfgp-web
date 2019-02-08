@@ -1,0 +1,17 @@
+{
+  "row": {
+    "$": { "version": "1.0" },
+    "id": "256",
+    "nome": "'CADERNO TILIBRA ESP CD 1 4 80FL ALOHA'",
+    "referencia": "'295566'",
+    "id_grupo": "2",
+    "id_fornece": "26",
+    "preco1": "10.99",
+    "preco2": "14.99",
+    "emb1": "4",
+    "emb2": "1",
+    "disponivel": "36",
+    "codebar1": "7891027295561",
+    "codebar2": "7891027061371"
+  }
+}

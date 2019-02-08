@@ -1,37 +1,54 @@
 const crypto = require('crypto');
 
 const User = require('../models/user');
+const Store = require('../models/store');
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const transporter = require('../configs/sendgrid');
 
 exports.register = async (req, res, next) => {
-  const { name, email, password } = req.body;
-
   try {
-    if (!email || !password || !name) {
-      const error = new Error('Empty field');
-      error.statusCode = 401;
-      error.message = 'Please fill all fields';
+    const { name, lastName, email, password, storeName } = req.body;
+
+    if (!email || !password || !name || !lastName || !storeName) {
+      const error = new Error(
+        'Campo vazio, por favor preencha todos os campos!'
+      );
+      error.statusCode = 400;
       throw error;
     }
 
     if (await User.findOne({ email })) {
-      const error = new Error('User already exists');
+      const error = new Error('Usuário já cadastrado com este email!');
       error.statusCode = 400;
-      error.message = 'User already exists';
       throw error;
     }
 
-    const user = await User.create(req.body);
+    // Create a new User
+    const newUser = {
+      name: name,
+      lastName: lastName,
+      email: email,
+      password: password
+    };
+    const user = await User.create(newUser);
+    // Create emailToken
     let emailToken =
       crypto.randomBytes(16).toString('hex') + `${user._id.toString()}`;
     user.emailToken = emailToken;
 
-    await User.findOneAndUpdate(user);
+    // Create a new Store
+    const newStore = { storeName: storeName, users: [{ userId: user._id }] };
+    await Store.create(newStore);
+
+    // Set emailToken
+    await User.findOneAndUpdate(user.email, {
+      $set: { emailToken: emailToken }
+    });
     user.password = undefined;
 
+    // Send email
     transporter.sendMail({
       to: { name: user.name, address: user.email },
       from: { address: 'no-reply@rfgpweb.com.br', name: 'rfgpweb' },
@@ -48,17 +65,13 @@ exports.register = async (req, res, next) => {
       .status(201)
       .json({ message: 'User created', userId: user._id.toString() });
   } catch (error) {
-    if (!error.statusCode) {
-      error.statusCode = 500;
-    }
     next(error);
   }
 };
 
 exports.authenticate = async (req, res, next) => {
-  const { email, password } = req.body;
-
   try {
+    const { email, password } = req.body;
     if (!email || !password) {
       const error = new Error('Empty field');
       error.statusCode = 401;
