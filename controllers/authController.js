@@ -25,24 +25,27 @@ exports.register = async (req, res, next) => {
       throw error;
     }
 
+    // Create a new Store
+    const newStore = { storeName: storeName };
+    const store = await Store.create(newStore);
+
     // Create a new User
     const newUser = {
       name: name,
       lastName: lastName,
       email: email,
-      password: password
+      password: password,
+      storeId: store._id
     };
     const user = await User.create(newUser);
-    // Create emailToken
+    // Set User to Store
+    store.users.push({ userId: user._id });
+    store.save();
+
+    // Set emailToken
     let emailToken =
       crypto.randomBytes(16).toString('hex') + `${user._id.toString()}`;
     user.emailToken = emailToken;
-
-    // Create a new Store
-    const newStore = { storeName: storeName, users: [{ userId: user._id }] };
-    await Store.create(newStore);
-
-    // Set emailToken
     await User.findOneAndUpdate(user.email, {
       $set: { emailToken: emailToken }
     });

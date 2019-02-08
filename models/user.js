@@ -48,6 +48,11 @@ const UserSchema = new Schema({
       }
     }
   ],
+  storeId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: 'Store'
+  },
   createdAt: {
     type: Date,
     default: Date.now
