@@ -6,16 +6,19 @@ exports.confirmEmail = async (req, res, next) => {
   try {
     const user = await User.findOne({ emailToken: emailToken });
     if (!user) {
-      const error = new Error('No user found!');
+      const error = new Error('Usuário não encontrado!');
       error.statusCode = 404;
-      error.message = 'No user found!';
       throw error;
     }
 
     if (user.emailChecked === true) {
       return res
         .status(200)
-        .json({ message: `${user.name}, seu email ja esta confirmado!` });
+        .json({
+          message: `Olá, ${user.name} ${
+            user.lastName
+          }, seu email já esta confirmado!`
+        });
     }
 
     // user.emailChecked = true;
@@ -28,12 +31,11 @@ exports.confirmEmail = async (req, res, next) => {
     });
 
     return res.status(201).json({
-      message: `Ola, ${user.name} seu e-mail foi confirmado com sucesso!`
+      message: `Olá, ${user.name} ${
+        user.lastName
+      }, seu email foi confirmado com sucesso!`
     });
   } catch (error) {
-    if (!error.statusCode) {
-      error.statusCode = 500;
-    }
     next(error);
   }
 };

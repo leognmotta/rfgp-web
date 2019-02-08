@@ -58,15 +58,16 @@ exports.register = async (req, res, next) => {
       subject: 'Cadastro concluido, por favor confirme seu email!',
       html: `
         <h1>Cadastro completo!</h1>
-        <p>O seu cadastro foi concluido com sucesso, no entanto precisamos que confira seu email clicando no link abaixo: </p>
+        <p>O seu cadastro foi concluido com sucesso, no entanto precisamos que confirme o seu email clicando no link abaixo: </p>
         <a href="http://localhost:8080/config/confirm-email/${
           user.emailToken
         }">http://localhost:8080/config/confirm-email/${user.emailToken}</a>
       `
     });
-    return res
-      .status(201)
-      .json({ message: 'User created', userId: user._id.toString() });
+    return res.status(201).json({
+      message: 'Usuário criado com sucesso!',
+      userId: user._id.toString()
+    });
   } catch (error) {
     next(error);
   }
@@ -76,27 +77,28 @@ exports.authenticate = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      const error = new Error('Empty field');
-      error.statusCode = 401;
-      error.message = 'Please fill all fields';
+      const error = new Error(
+        'Campo vazio, por favor preencha todos os campos!'
+      );
+      error.statusCode = 400;
       throw error;
     }
 
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
-      const error = new Error('User not registered');
-      error.statusCode = 400;
-      error.message = 'User not registered';
+      const error = new Error(
+        'Usuário não registrado, por favor crie uma conta!'
+      );
+      error.statusCode = 404;
       throw error;
     }
 
     const isPasswordEqual = await bcrypt.compare(password, user.password);
 
     if (!isPasswordEqual) {
-      const error = new Error('Invalid password');
+      const error = new Error('Senha inválida!');
       error.statusCode = 400;
-      error.message = 'Invalid password';
       throw error;
     }
 
@@ -110,23 +112,20 @@ exports.authenticate = async (req, res, next) => {
 
     return res.status(200).json({ userId: user._id.toString(), token: token });
   } catch (error) {
-    if (!error.statusCode) {
-      error.statusCode = 500;
-    }
     next(error);
   }
 };
 
 exports.sendResetPassword = async (req, res, next) => {
-  const { email } = req.body;
-
   try {
+    const { email } = req.body;
     const user = await User.findOne({ email });
 
     if (!user) {
-      const error = new Error('User not found');
-      error.statusCode = 400;
-      error.message = 'User not found, could not send reset password email.';
+      const error = new Error(
+        'Usuário não encontrado, não foi possível enviar email!'
+      );
+      error.statusCode = 404;
       throw error;
     }
 
@@ -156,9 +155,6 @@ exports.sendResetPassword = async (req, res, next) => {
 
     return res.status(200).json({ message: 'Email sent!' });
   } catch (error) {
-    if (!error.statusCode) {
-      error.statusCode = 500;
-    }
     next(error);
   }
 };
@@ -171,18 +167,16 @@ exports.resetPassword = async (req, res, next) => {
     const user = await User.findOne({ passwordResetToken });
 
     if (!user) {
-      const error = new Error('User not found');
+      const error = new Error('Não foi possível encontrar o usuário!');
       error.statusCode = 404;
-      error.message = 'Could not find user';
       throw error;
     }
 
     const now = new Date();
 
     if (now > user.passwordResetExpires) {
-      const error = new Error('Token expired!');
+      const error = new Error('Token expirado!');
       error.statusCode(400);
-      error.message = 'Token expired!';
       throw error;
     }
 
@@ -194,9 +188,6 @@ exports.resetPassword = async (req, res, next) => {
 
     return res.status(200).json({ message: 'Senha alterada com sucesso!' });
   } catch (error) {
-    if (!error.statusCode) {
-      error.statusCode = 500;
-    }
     next(error);
   }
 };
