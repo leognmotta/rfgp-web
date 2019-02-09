@@ -4,7 +4,7 @@ require('body-parser-xml')(bodyParser);
 const mongoose = require('mongoose');
 
 const authRoutes = require('./routes/auth');
-const projectRoutes = require('./routes/project');
+const shopRoutes = require('./routes/shop');
 const userConfigRoutes = require('./routes/userConfig');
 
 const app = express();
@@ -35,7 +35,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/auth', authRoutes);
-app.use('/projects', projectRoutes);
+app.use('/shop', shopRoutes);
 app.use('/config', userConfigRoutes);
 
 app.use((error, req, res, next) => {
