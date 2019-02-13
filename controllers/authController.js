@@ -191,3 +191,7 @@ exports.resetPassword = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.isValidToken = async (req, res, next) => {
+  return res.status(200).json({ message: 'true' });
+};

@@ -40,14 +40,7 @@ const UserSchema = new Schema({
     type: Date,
     select: false
   },
-  cartsIds: [
-    {
-      cart: {
-        type: Schema.Types.ObjectId,
-        ref: 'Cart'
-      }
-    }
-  ],
+  cartsIds: [{ type: Schema.Types.ObjectId, ref: 'Cart' }],
   storeId: {
     type: Schema.Types.ObjectId,
     required: true,

@@ -28,7 +28,8 @@ const CartSchema = new Schema({
   ],
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    expires: 259200000
   }
 });
 

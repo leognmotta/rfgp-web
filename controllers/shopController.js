@@ -7,8 +7,6 @@ exports.getProductsByTitle = async (req, res, next) => {
 
     const product = await axios.get(`http://localhost:8000/produtos/${title}`);
 
-    console.log(product.data);
-
     if (!product) {
       const error = new Error('Nenhum produto encontrado!');
       error.statusCode = 400;

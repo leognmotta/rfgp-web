@@ -23,6 +23,7 @@ module.exports = (req, res, next) => {
     decodedToken = jwt.verify(token, `${process.env.JWT_SECRET}`);
   } catch (error) {
     error.statusCode = 500;
+    error.message = 'false';
     throw error;
   }
 
