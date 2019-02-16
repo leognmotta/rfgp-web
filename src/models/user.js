@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 
 const Schema = mongoose.Schema;
 
@@ -53,12 +56,22 @@ const UserSchema = new Schema({
 });
 
 UserSchema.pre('save', async function(next) {
-  const hash = await bcrypt.hash(this.password, 10);
-  this.password = hash;
+  if (this.isModified('password') || this.isNew) {
+    const hash = await bcrypt.hash(this.password, 10);
+    this.password = hash;
+  }
 
   next();
 });
 
-const User = mongoose.model('User', UserSchema);
+UserSchema.methods.getToken = function() {
+  return jwt.sign({ userId: this._id }, process.env.SECRET_OR_KEY, {
+    expiresIn: '5h'
+  });
+};
 
-module.exports = User;
+UserSchema.methods.createEmailToken = function() {
+  return crypto.randomBytes(16).toString('hex') + this._id.toString();
+};
+
+module.exports = mongoose.model('User', UserSchema);

@@ -1,4 +1,3 @@
-const api = require('../services/api');
 const axios = require('axios');
 
 exports.getProductsByTitle = async (req, res, next) => {
