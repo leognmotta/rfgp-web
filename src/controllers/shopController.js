@@ -22,6 +22,8 @@ exports.getProductsByCodebar = async (req, res, next) => {
   try {
     const codebar = req.params.codebar;
 
+    console.log(codebar);
+
     const product = await axios.get(
       `http://localhost:8000/produtos/codebar/${codebar}`
     );
