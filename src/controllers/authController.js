@@ -48,9 +48,9 @@ exports.postSignUp = async (req, res, next) => {
         <p>Ola ${
           user.name
         }, seu cadastro foi concluido com sucesso, no entanto precisamos que confirme o seu email clicando no link abaixo: </p>
-        <a href="http://localhost:8080/v1/auth/validate-email/${
+        <a href="http://localhost:3000/validar-email/${
           user.emailToken
-        }">http://localhost:8080/v1/auth/validate-email/${user.emailToken}</a>
+        }">http://localhost:3000/validar-email/${user.emailToken}</a>
       `
     });
 
