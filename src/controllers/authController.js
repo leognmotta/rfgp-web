@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 const User = require('../models/user');
 const Store = require('../models/store');
@@ -98,15 +99,13 @@ exports.putConfirmEmail = async (req, res, next) => {
     const user = await User.findOne({ emailToken: emailToken });
     if (!user) {
       const error = new Error('Usuário não encontrado!');
-      error.statusCode = 404;
+      error.status = 404;
       throw error;
     }
 
     if (user.emailChecked === true) {
       return res.status(200).json({
-        message: `Olá, ${user.name} ${
-          user.lastName
-        }, seu email já esta confirmado!`
+        message: `Olá, ${user.name} ${user.lastName}, seu email já esta confirmado!`
       });
     }
 
@@ -120,10 +119,82 @@ exports.putConfirmEmail = async (req, res, next) => {
     });
 
     return res.status(201).json({
-      message: `Olá, ${user.name} ${
-        user.lastName
-      }, seu email foi confirmado com sucesso!`
+      message: `Olá, ${user.name} ${user.lastName}, seu email foi confirmado com sucesso!`
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.postSendResetPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      const error = new Error('Usuário não encontrado.');
+      error.status = 400;
+      throw error;
+    }
+
+    const token = crypto.randomBytes(20).toString('hex') + `${user._id.toString()}`;
+
+    const expirationDate = new Date();
+    expirationDate.setHours(expirationDate.getHours() + 1);
+
+    await User.findByIdAndUpdate(user._id, {
+      $set: {
+        passwordResetToken: token,
+        passwordResetExpires: expirationDate
+      }
+    });
+
+    transporter.sendMail({
+      to: { name: user.name, address: user.email },
+      from: { address: 'no-reply@rfgpweb.com.br', name: 'rfgpweb' },
+      subject: 'Resetar senha',
+      html: `
+        <h1>Esqueceu sua senha?</h1>
+        <p> Resete sua senha clicando no link abaixo: </p>
+        <a href="http://localhost:3000/resetar-senha/${token}">http://localhost:3000/auth/send-reset-password/${token}</a>
+      `
+    });
+
+    return res.status(200).json({ message: 'Email enviado.' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.putResetPassword = async (req, res, next) => {
+  try {
+    const passwordResetToken = req.params.token;
+    const { password } = req.body;
+
+    const user = await User.findOne({ passwordResetToken }).select('+passwordResetExpires');
+    console.log(user);
+
+    if (!user) {
+      const error = new Error('Usuário não encontrado.');
+      error.status = 404;
+      throw error;
+    }
+
+    const now = new Date();
+
+    if (now > user.passwordResetExpires) {
+      const error = new Error('Token expirado.');
+      error.status = 400;
+      throw error;
+    }
+
+    user.password = password;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save();
+
+    return res.status(200).json({ message: 'Senha alterada com sucesso!' });
   } catch (error) {
     next(error);
   }
