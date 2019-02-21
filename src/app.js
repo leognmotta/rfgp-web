@@ -1,4 +1,5 @@
 // Built in node.js
+const http = require('http');
 
 // Third part libs
 const express = require('express');
@@ -21,6 +22,7 @@ const v1 = require('./routes/index.v1');
 // Models
 
 const app = express();
+const server = http.createServer(app);
 
 app.use(helmet());
 app.use(cors());
@@ -66,7 +68,7 @@ mongoose
     { useNewUrlParser: true, useFindAndModify: false, useCreateIndex: true }
   )
   .then(result => {
-    app.listen(process.env.PORT || 8080, () => {
+    server.listen(process.env.PORT || 8080, () => {
       console.log(`App listening on port ${process.env.PORT || 8080}`);
     });
   })

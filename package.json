@@ -8,7 +8,7 @@
     "start": "node src/app"
   },
   "keywords": [],
-  "author": "",
+  "author": "Leonardo Motta <leo@domboscoatacado.com.br>",
   "license": "ISC",
   "devDependencies": {
     "dotenv": "^6.2.0",
@@ -31,5 +31,6 @@
     "parse-error": "^0.2.0",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0"
-  }
+  },
+  "repository": "https://github.com/leomotta121/rfgp-web.git"
 }
