@@ -1,5 +1,4 @@
 // Built in node.js
-const http = require('http');
 
 // Third part libs
 const express = require('express');
@@ -22,7 +21,6 @@ const v1 = require('./routes/index.v1');
 // Models
 
 const app = express();
-const server = http.createServer(app);
 
 app.use(helmet());
 app.use(cors());
@@ -62,13 +60,13 @@ process.on('unhandledRejection', error => {
 
 mongoose
   .connect(
-    `mongodb+srv://${process.env.DB_USER}:${
-      process.env.DB_PASSWORD
-    }@cluster0-sud5s.mongodb.net/${process.env.DB_NAME}`,
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0-sud5s.mongodb.net/${
+      process.env.DB_NAME
+    }`,
     { useNewUrlParser: true, useFindAndModify: false, useCreateIndex: true }
   )
   .then(result => {
-    server.listen(process.env.PORT || 8080, () => {
+    app.listen(process.env.PORT || 8080, () => {
       console.log(`App listening on port ${process.env.PORT || 8080}`);
     });
   })
