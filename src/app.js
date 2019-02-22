@@ -17,7 +17,7 @@ const helmet = require('helmet');
 const { catch404, errorHandler } = require('./middlewares/errors');
 
 // Routes
-const v1 = require('./routes/index.v1');
+const v1 = require('./routes/v1');
 
 // Models
 
@@ -67,11 +67,11 @@ mongoose
     }`,
     { useNewUrlParser: true, useFindAndModify: false, useCreateIndex: true }
   )
-  .then(result => {
-    server.listen(process.env.PORT || 8080, () => {
-      console.log(`App listening on port ${process.env.PORT || 8080}`);
-    });
+  .then(() => {
+    console.log('Connected to database');
   })
   .catch(error => {
     console.log(error);
   });
+
+module.exports = server;

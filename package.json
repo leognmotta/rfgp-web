@@ -2,10 +2,10 @@
   "name": "passport-express",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "dev": "nodemon bin/dev",
-    "start": "node src/app"
+    "start": "node src/server.js"
   },
   "keywords": [],
   "author": "Leonardo Motta <leo@domboscoatacado.com.br>",

@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-const auth = require('./v1/authRoutes');
-const shopRoutes = require('./v1/shopRoutes');
+const authRoutes = require('./authRoutes');
+const shopRoutes = require('./shopRoutes');
 
-router.use('/auth', auth);
+router.use('/auth', authRoutes);
 router.use('/shop', shopRoutes);
 
 module.exports = router;
