@@ -6,9 +6,9 @@ exports.getProductsByTitle = async (req, res, next) => {
 
     const product = await axios.get(`http://localhost:8000/produtos/${title}`);
 
-    if (!product) {
+    if (product.data.produtos.length < 1) {
       const error = new Error('Nenhum produto encontrado!');
-      error.statusCode = 400;
+      error.status = 400;
       throw error;
     }
 
@@ -24,13 +24,12 @@ exports.getProductsByCodebar = async (req, res, next) => {
 
     console.log(codebar);
 
-    const product = await axios.get(
-      `http://localhost:8000/produtos/codebar/${codebar}`
-    );
+    const product = await axios.get(`http://localhost:8000/produtos/codebar/${codebar}`);
 
-    if (!product) {
+    console.log(product.data.produtos);
+    if (!product.data.produtos || product.data.produtos === 'Nenhum produto encontrado!') {
       const error = new Error('Nenhum produto encontrado!');
-      error.statusCode = 400;
+      error.status = 404;
       throw error;
     }
 
