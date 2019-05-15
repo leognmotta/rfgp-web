@@ -1,9 +1,3 @@
-# basic-passport-jwt-express
-
-**Note: the frontend app for this api can be found on the link below:**
-
-[basic-passport-jwt-react](https://github.com/leomotta121/basic-passport-jwt-react)
-
 ## Instructions:
 
 In the project directory, you can run:
